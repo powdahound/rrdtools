@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>RRD Tools</title>
+	<link rel="stylesheet" href="/css/main.css" type="text/css" media="screen" charset="utf-8">
+</head>
+<body>
+
+  <h1>RRA Calculator</h1>  
+  <p class="desc">
+    Helps you generate RRA definitions without doing the math.
+    <a href="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html">Documentation here</a>.
+  </p>
+  <form method="post" accept-charset="utf-8">
+    <p>
+      <label for="step">Step:</label>
+      <input type="text" name="step" value="{{ step }}" id="step" size="4"> (seconds)
+    </p>
+    <p>
+      <label for="step">Xfiles factor:</label>
+      <input type="text" name="xff" value="{{ xff }}" id="xff" size="4"> (0 to 1)
+    </p>
+    <p>Enter RRA lengths like "Every '60 seconds' for '1 day'".</p>
+    <!-- Djang 0.96 templating is absolute crap. There's no way to do "for key, val in dict". WTF? -->
+    {% for rra in rras %}
+    <p>
+      <label for="rra_{{ rra.num }}_length">RRA {{ rra.num }}:</label>
+      Every <input type="text" name="rra_{{ rra.num }}_step" id="rra_{{ rra.num }}_step" value="{{ rra.step }}" size="15"> for
+      <input type="text" name="rra_{{ rra.num }}_length" id="rra_{{ rra.num }}_length" value="{{ rra.length }}" size="15">
+    </p>
+    {% endfor %}
+    <p>
+      <input type="submit" value="Generate &rarr;">
+    </p>
+  </form>
+  
+  <!-- Show results! -->
+  {% if rra_code %}
+    <h2>RRA Definitions</h2>
+    <p>Format: <em>RRA:AVERAGE | MIN | MAX | LAST:xff:steps:rows</em> (<a href="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html">docs</a>)</p>
+    <textarea rows="5" cols="50">{{ rra_code }}</textarea>
+  {% endif %}
+  
+  <p style="float:right">Written by <a href="http://powdahound.com">Garret Heaton</a></p>
+</body>
+</html>
